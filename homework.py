@@ -8,11 +8,7 @@ import exceptions
 import settings
 from http import HTTPStatus
 
-
-
 from dotenv import load_dotenv
-
-
 
 load_dotenv()
 
@@ -30,17 +26,6 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# RETRY_TIME = 600
-# ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-# HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
-
-
-# HOMEWORK_STATUSES = {
-#     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
-#     'reviewing': 'Работа взята на проверку ревьюером.',
-#     'rejected': 'Работа проверена: у ревьюера есть замечания.'
-# }
-
 
 def send_message(bot, message):
     """Отправка сообщения в telegram чат."""
@@ -52,7 +37,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
-    """Получение ответа на запрос к API-сервису"""
+    """Получение ответа на запрос к API-сервису."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -66,11 +51,7 @@ def get_api_answer(current_timestamp):
     if response.status_code != HTTPStatus.OK:
         message = (f'Запрос к эндпоинту вернул код {HTTPStatus.code}')
         raise requests.exceptions.RequestException(message)
-    #try:
     return response.json()
-    # except ValueError:
-    #     logger.error('Ответ получен не в формате json')
-    #     return {}
 
 
 def check_response(response):
@@ -89,6 +70,7 @@ def check_response(response):
         raise exceptions.HomeworksNotInList(message)
     return response.get('homeworks')
 
+
 def parse_status(homework):
     """Получение статуса домашней работы."""
     if not (('homework_name' in homework) and ('homework_status' in homework)):
@@ -105,8 +87,9 @@ def check_tokens():
     for envvar in envvars:
         if envvar is None:
             logger.critical(f'Отстутствует переменная окружения: {envvar}')
-            return  False
+            return False
     return True
+
 
 def main():
     """Основная логика работы бота."""
@@ -118,7 +101,7 @@ def main():
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
             if homeworks:
-                send_message(bot ,parse_status(homeworks[0]))
+                send_message(bot, parse_status(homeworks[0]))
             else:
                 logger.debug('Статус работы не изменился')
             current_timestamp = current_timestamp
