@@ -8,3 +8,11 @@ class MissingHomeworkKey(Exception):
 
 class HomeworksNotInList(Exception):
     """Getting homeworks not in list."""
+
+
+class WrongHTTPStatus(Exception):
+    """HTTPStatus is not OK"""
+
+
+class MissingHwrkNameOrStatus(Exception):
+    """Homework name or status is missing"""

@@ -1,12 +1,5 @@
-import os
-from dotenv import load_dotenv
-
-
-load_dotenv()
-
 RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-HEADERS = {'Authorization': f'OAuth {os.getenv("PRACTICUM_TOKEN")}'}
 
 
 HOMEWORK_STATUSES = {
