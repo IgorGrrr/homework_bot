@@ -25,8 +25,8 @@ def send_message(bot, message):
     """Отправка сообщения в telegram чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
-    except telegram.error.TelegramError:
-        logger.error(f'Не получилось отправить сообщение')
+    except telegram.error.TelegramError as telegram_error:
+        logger.error(f'Не получилось отправить сообщение: {telegram_error}')
     else:
         logger.info('Сообщение отправлено')
 
@@ -56,10 +56,10 @@ def check_response(response):
         message = 'Неправильный тип полученного ответа'
         raise TypeError(message)
     if response.get('homeworks') is None:
-        message = 'В полученном ответе отсутсвует необходимый ключ homeworks'
+        message = 'В полученном ответе отсутсвует ключ homeworks'
         raise exceptions.MissingHomeworkKey(message)
     elif response.get('current_date') is None:
-        message = 'В полученном ответе отсутсвует необходимый ключ current_date'
+        message = 'В полученном ответе отсутсвует ключ current_date'
         raise exceptions.MissingHomeworkKey(message)
     if not isinstance(response['homeworks'], list):
         message = 'Перечень домашних работ должен содержаться в списке'
@@ -97,7 +97,7 @@ def main():
     )
     handler = logging.StreamHandler(stream=sys.stdout)
     logger.addHandler(handler)
-    if  not check_tokens():
+    if not check_tokens():
         message = 'Отстутствует переменная окружения'
         logger.critical(message)
         exit()
