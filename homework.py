@@ -25,7 +25,7 @@ def send_message(bot, message):
     """Отправка сообщения в telegram чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
-    except telegram.error.TelegramError as telegram_error:
+    except telegram.error.TelegramError:
         message = 'Не получилось отправить сообщение'
         logger.error(message)
     else:
@@ -43,7 +43,7 @@ def get_api_answer(current_timestamp):
             params=params
         )
         logger.info('Начинаем запрос к API')
-    except Exception as e:
+    except exceptions.APIRequestError:
         message = 'При запросе к API произошла ошибка'
         logging.error(message)
     if response.status_code != HTTPStatus.OK:
@@ -68,6 +68,7 @@ def check_response(response):
         message = 'Перечень домашних работ должен содержаться в списке'
         raise exceptions.HomeworksNotInList(message)
     return homeworks
+
 
 def parse_status(homework):
     """Получение статуса домашней работы."""
