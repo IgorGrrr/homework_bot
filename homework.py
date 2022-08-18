@@ -58,7 +58,7 @@ def check_response(response):
     if not isinstance(response, dict):
         message = 'Неправильный тип полученного ответа'
         raise TypeError(message)
-    if homeworks  is None:
+    if homeworks is None:
         message = 'В полученном ответе отсутсвует ключ homeworks'
         raise exceptions.MissingHomeworkKey(message)
     elif response.get('current_date') is None:
