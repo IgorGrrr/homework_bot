@@ -26,7 +26,8 @@ def send_message(bot, message):
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
     except telegram.error.TelegramError as telegram_error:
-        logger.error(f'Не получилось отправить сообщение: {telegram_error}')
+        message = 'Не получилось отправить сообщение'
+        logger.error(message)
     else:
         logger.info('Сообщение отправлено')
 
@@ -43,7 +44,8 @@ def get_api_answer(current_timestamp):
         )
         logger.info('Начинаем запрос к API')
     except Exception as e:
-        logging.error(f'Произошла ошибка: {e}')
+        message = 'При запросе к API произошла ошибка'
+        logging.error(message)
     if response.status_code != HTTPStatus.OK:
         message = (f'Запрос к эндпоинту вернул код {HTTPStatus.code}')
         raise exceptions.WrongHTTPStatus(message)
@@ -52,20 +54,20 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверка ответа API на корректность."""
+    homeworks = response.get('homeworks')
     if not isinstance(response, dict):
         message = 'Неправильный тип полученного ответа'
         raise TypeError(message)
-    if response.get('homeworks') is None:
+    if homeworks is None:
         message = 'В полученном ответе отсутсвует ключ homeworks'
         raise exceptions.MissingHomeworkKey(message)
     elif response.get('current_date') is None:
         message = 'В полученном ответе отсутсвует ключ current_date'
         raise exceptions.MissingHomeworkKey(message)
-    if not isinstance(response['homeworks'], list):
+    if not isinstance(homeworks, list):
         message = 'Перечень домашних работ должен содержаться в списке'
         raise exceptions.HomeworksNotInList(message)
-    return response.get('homeworks')
-
+    return homeworks
 
 def parse_status(homework):
     """Получение статуса домашней работы."""
@@ -76,7 +78,6 @@ def parse_status(homework):
         raise exceptions.MissingHwrkNameOrStatus(message)
     if homework_status not in settings.HOMEWORK_STATUSES:
         message = 'Статус домашней работы отличается от ожидаемого'
-        logging.error(message)
         raise KeyError(message)
     verdict = settings.HOMEWORK_STATUSES[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
@@ -112,11 +113,11 @@ def main():
             else:
                 logger.debug('Статус работы не изменился')
             current_timestamp = response['current_date']
-            time.sleep(settings.RETRY_TIME)
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
+            send_message(bot, message)
         finally:
             time.sleep(settings.RETRY_TIME)
 
