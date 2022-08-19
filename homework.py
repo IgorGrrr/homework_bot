@@ -21,6 +21,7 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
+
 def send_message(bot, message):
     """Отправка сообщения в telegram чат."""
     bot.send_message(TELEGRAM_CHAT_ID, message)
