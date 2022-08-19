@@ -1,5 +1,7 @@
 class APIRequestError(Exception):
     """API request failed"""
+
+
 class WrongResponseType(Exception):
     """Getting response not in dictionary form."""
 

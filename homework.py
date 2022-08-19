@@ -10,7 +10,6 @@ from http import HTTPStatus
 
 from dotenv import load_dotenv
 
-HEADERS = {'Authorization': f'OAuth {os.getenv("PRACTICUM_TOKEN")}'}
 
 load_dotenv()
 
@@ -20,14 +19,14 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
+HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 def send_message(bot, message):
     """Отправка сообщения в telegram чат."""
-    try:
-        bot.send_message(TELEGRAM_CHAT_ID, message)
-    except telegram.error.TelegramError:
+    bot.send_message(TELEGRAM_CHAT_ID, message)
+    if not send_message():
         message = 'Не получилось отправить сообщение'
-        logger.error(message)
+        raise exceptions.TelegramError(message)
     else:
         logger.info('Сообщение отправлено')
 
@@ -36,16 +35,15 @@ def get_api_answer(current_timestamp):
     """Получение ответа на запрос к API-сервису."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
-    try:
-        response = requests.get(
-            settings.ENDPOINT,
-            headers=HEADERS,
-            params=params
-        )
-        logger.info('Начинаем запрос к API')
-    except exceptions.APIRequestError:
-        message = 'При запросе к API произошла ошибка'
-        logging.error(message)
+    response = requests.get(
+        settings.ENDPOINT,
+        headers=HEADERS,
+        params=params
+    )
+    logger.info('Начинаем запрос к API')
+    message = 'При запросе к API произошла ошибка'
+    if response.status_code == HTTPStatus.SERVICE_UNAVAILABLE:
+        raise exceptions.APIRequestError(message)
     if response.status_code != HTTPStatus.OK:
         message = (f'Запрос к эндпоинту вернул код {HTTPStatus.code}')
         raise exceptions.WrongHTTPStatus(message)
@@ -54,10 +52,10 @@ def get_api_answer(current_timestamp):
 
 def check_response(response):
     """Проверка ответа API на корректность."""
-    homeworks = response['homeworks']
     if not isinstance(response, dict):
         message = 'Неправильный тип полученного ответа'
         raise TypeError(message)
+    homeworks = response.get('homeworks')
     if homeworks is None:
         message = 'В полученном ответе отсутсвует ключ homeworks'
         raise exceptions.MissingHomeworkKey(message)
