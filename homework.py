@@ -22,13 +22,14 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
-def send_message(bot, message):
+def send_message(bot, message): 
     """Отправка сообщения в telegram чат."""
-    bot.send_message(TELEGRAM_CHAT_ID, message)
-    if not send_message():
+    try: 
+        bot.send_message(TELEGRAM_CHAT_ID, message)
+    except telegram.error.TelegramError: 
         message = 'Не получилось отправить сообщение'
-        raise exceptions.TelegramError(message)
-    else:
+        raise exceptions.SendMessageError(message) 
+    else: 
         logger.info('Сообщение отправлено')
 
 
@@ -113,7 +114,9 @@ def main():
             else:
                 logger.debug('Статус работы не изменился')
             current_timestamp = response['current_date']
-
+        except exceptions.SendMessageError as error:
+            message = 'Не получилось отправить сообщение'
+            logging.error(message)
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)

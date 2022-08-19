@@ -1,3 +1,7 @@
+class SendMessageError(Exception):
+    """Sending messsage is failed"""
+
+
 class APIRequestError(Exception):
     """API request failed"""
 
