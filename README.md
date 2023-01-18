@@ -17,7 +17,7 @@ git clone <ссылка>
 cd homework_bot
 ```
 
-Cоздать и активировать виртуальное окружение:
++ Cоздать и активировать виртуальное окружение:
 
 ```
 python3 -m venv env
@@ -31,7 +31,7 @@ source env/bin/activate
 python3 -m pip install --upgrade pip
 ```
 
-Установить зависимости из файла requirements.txt:
++ Установить зависимости из файла requirements.txt:
 
 ```
 pip install -r requirements.txt
@@ -46,7 +46,7 @@ TELEGRAM_TOKEN=ваш телеграм токен
 TELEGRAM_CHAT_ID=телеграм токен бота
 ```
 
-Запустить проект:
++ Запустить проект:
 
 ```
 python homework.py 
